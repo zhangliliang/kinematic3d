@@ -13,12 +13,12 @@ def Config():
     
     # solver settings
     conf.solver_type = 'sgd'
-    conf.lr = 0.004
+    conf.lr = 0.016
     conf.momentum = 0.9
     conf.weight_decay = 0.0005
-    conf.max_iter = 80000
-    conf.snapshot_iter = 20000
-    conf.display = 250
+    conf.max_iter = 20000
+    conf.snapshot_iter = 5000
+    conf.display = 100
     conf.do_test = True
     
     conf.fast_eval = True
@@ -73,7 +73,7 @@ def Config():
     # ----------------------------------------
     
     # detection sampling
-    conf.batch_size = 2
+    conf.batch_size = 8
     conf.fg_image_ratio = 1.0
     conf.box_samples = 0.20
     conf.fg_fraction = 0.20
