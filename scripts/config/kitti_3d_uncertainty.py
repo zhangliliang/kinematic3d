@@ -13,12 +13,12 @@ def Config():
     
     # solver settings
     conf.solver_type = 'sgd'
-    conf.lr = 0.004
+    conf.lr = 0.016
     conf.momentum = 0.9
     conf.weight_decay = 0.0005
-    conf.max_iter = 50000
-    conf.snapshot_iter = 25000
-    conf.display = 250
+    conf.max_iter = 12500
+    conf.snapshot_iter = 2500
+    conf.display = 100
     conf.do_test = True
     
     conf.fast_eval = True
@@ -28,7 +28,7 @@ def Config():
     conf.lr_steps = None
     conf.lr_target = conf.lr * 0.00001
     
-    conf.pretrained = 'output/kitti_3d_warmup/weights/model_80000_pkl'
+    conf.pretrained = 'output/kitti_3d_warmup/weights/model_20000_pkl'
     conf.copy_stats = True
     
     # random
@@ -78,7 +78,7 @@ def Config():
     # ----------------------------------------
     
     # detection sampling
-    conf.batch_size = 2
+    conf.batch_size = 8
     conf.fg_image_ratio = 1.0
     conf.box_samples = 0.20
     conf.fg_fraction = 0.20
