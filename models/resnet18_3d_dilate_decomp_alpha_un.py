@@ -55,6 +55,8 @@ class RPN(nn.Module):
         self.bbox_h3d = nn.Conv2d(self.prop_feats[0].out_channels, self.num_anchors, 1)
         self.bbox_l3d = nn.Conv2d(self.prop_feats[0].out_channels, self.num_anchors, 1)
 
+        self.bbox_un = nn.Conv2d(self.prop_feats[0].out_channels, self.num_anchors, 1)
+
         self.bbox_alpha = nn.Conv2d(self.prop_feats[0].out_channels, self.num_anchors, 1)
         self.bbox_axis = nn.Conv2d(self.prop_feats[0].out_channels, self.num_anchors, 1)
         self.bbox_head = nn.Conv2d(self.prop_feats[0].out_channels, self.num_anchors, 1)
@@ -66,7 +68,7 @@ class RPN(nn.Module):
         self.feat_size = [0, 0]
         self.anchors = conf.anchors
 
-    def forward(self, x):
+    def forward(self, x, return_base=False):
 
         batch_size = x.size(0)
 
@@ -90,8 +92,11 @@ class RPN(nn.Module):
         bbox_h3d = self.bbox_h3d(prop_feats)
         bbox_l3d = self.bbox_l3d(prop_feats)
         bbox_alpha = self.bbox_alpha(prop_feats)
+
         bbox_axis = self.sigmoid(self.bbox_axis(prop_feats))
         bbox_head = self.sigmoid(self.bbox_head(prop_feats))
+
+        bbox_un = self.sigmoid(self.bbox_un(prop_feats))
 
         feat_h = cls.size(2)
         feat_w = cls.size(3)
@@ -118,9 +123,11 @@ class RPN(nn.Module):
         bbox_axis = flatten_tensor(bbox_axis.view(batch_size, 1, feat_h * self.num_anchors, feat_w))
         bbox_head = flatten_tensor(bbox_head.view(batch_size, 1, feat_h * self.num_anchors, feat_w))
 
+        bbox_un = flatten_tensor(bbox_un.view(batch_size, 1, feat_h * self.num_anchors, feat_w))
+
         # bundle
         bbox_2d = torch.cat((bbox_x, bbox_y, bbox_w, bbox_h), dim=2)
-        bbox_3d = torch.cat((bbox_x3d, bbox_y3d, bbox_z3d, bbox_w3d, bbox_h3d, bbox_l3d, bbox_alpha, bbox_alpha.clone(), bbox_axis, bbox_head), dim=2)
+        bbox_3d = torch.cat((bbox_x3d, bbox_y3d, bbox_z3d, bbox_w3d, bbox_h3d, bbox_l3d, bbox_alpha, bbox_alpha.clone(), bbox_axis, bbox_head, bbox_un), dim=2)
 
         feat_size = torch.IntTensor([feat_h, feat_w]).cuda()
 
@@ -134,6 +141,7 @@ class RPN(nn.Module):
             self.rois = self.rois.type(torch.cuda.FloatTensor)
 
             # more computations
+            # tracker_raw = self.rois[:, 4].cpu().detach().numpy().astype(np.int64)
             self.rois_3d = self.anchors[self.rois[:, 4].type(torch.LongTensor), :]
             self.rois_3d = torch.tensor(self.rois_3d, requires_grad=False).type(torch.cuda.FloatTensor)
 
@@ -155,7 +163,10 @@ class RPN(nn.Module):
 
         else:
 
-            return cls, prob, bbox_2d, bbox_3d, feat_size, self.rois
+            if return_base:
+                return cls, prob, bbox_2d, bbox_3d, feat_size, self.rois, x
+            else:
+                return cls, prob, bbox_2d, bbox_3d, feat_size, self.rois
 
 
 def build(conf, phase):
