@@ -140,7 +140,7 @@ class RPN(nn.Module):
         bbox_2d = torch.cat((bbox_x, bbox_y, bbox_w, bbox_h), dim=2)
         bbox_3d = torch.cat((bbox_x3d, bbox_y3d, bbox_z3d, bbox_w3d, bbox_h3d, bbox_l3d, bbox_alpha, bbox_alpha.clone(), bbox_axis, bbox_head, bbox_un), dim=2)
 
-        feat_size = torch.IntTensor([feat_h, feat_w]).cuda()
+        feat_size = [feat_h, feat_w]
 
         cls = flatten_tensor(cls)
         prob = flatten_tensor(prob)
