@@ -41,7 +41,7 @@ class RPN(nn.Module):
         )
 
         self.pose_feats = nn.Sequential(
-            nn.Conv2d(1024 * 2, 512, 3, padding=1),
+            nn.Conv2d(512 * 2, 512, 3, padding=1),
             nn.ReLU(inplace=True),
         )
 
